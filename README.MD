@@ -13,7 +13,7 @@ This repository provides a portable, secure, and scalable way to manage personal
 ## Getting Started
 ### 1. Clone this repo
 ```
-git clone git@gh-geoff:sailorgeoffrey/system-config.git`
+git clone https://github.com/sailorgeoffrey/system-config.git`
 cd system-config
 ```
 ### 2. Create a bootstrap.yaml
