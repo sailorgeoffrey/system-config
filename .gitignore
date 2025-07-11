@@ -1,0 +1,7 @@
+# Ignore sensitive files
+.aws/credentials
+.ssh/id_*
+.ssh/authorized_keys
+.ssh/known_hosts
+.ssh/config.local
+.git-credentials

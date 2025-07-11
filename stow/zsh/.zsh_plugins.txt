@@ -1,0 +1,13 @@
+# Autosuggestions
+zsh-users/zsh-autosuggestions
+
+# Syntax highlighting
+zsh-users/zsh-syntax-highlighting
+
+# Fuzzy tab completion
+Aloxaf/fzf-tab
+
+# Optional: z (jump around directories)
+rupa/z
+
+
