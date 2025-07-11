@@ -1,6 +1,6 @@
 # System Configuration Bootstrap
 
-This repository provides a portable, secure, and scalable way to manage personal and professional dotfiles, SSH keys, and Git configuration for developers — especially consultants who interact with multiple GitHub organizations.
+This repository provides a portable, secure, and scalable way to manage personal and professional homebrew dependencies, dotfiles, SSH keys, and Git configuration. All sensative data is generated with the bootstrap script, so all you need to do is distribute the generated public keys as needed when prompted.
 
 ## Features
 - 📁 Uses stow to manage dotfiles cleanly and modularly
