@@ -1,21 +1,15 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+CONFIG_FILE="bootstrap.yaml"
 STOW_DIR="stow"
 TARGET_DIR="$HOME"
 
-# Confirm we're running from the right place
-if [ ! -d "$STOW_DIR" ]; then
-  echo "ERROR: Could not find '$STOW_DIR' directory. Run this from the root of your system-config repo."
-  exit 1
-fi
-
 # --- Ensure Homebrew is installed ---
 if ! command -v brew >/dev/null 2>&1; then
-  echo "🛠  Homebrew not found. Installing it now..."
+  echo "🛠  Homebrew not found. Installing..."
   NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-  # Ensure brew is on PATH (needed for new shells)
   if [[ -d /opt/homebrew/bin ]]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
   elif [[ -d /usr/local/bin ]]; then
@@ -23,33 +17,122 @@ if ! command -v brew >/dev/null 2>&1; then
   fi
 fi
 
-# --- Install Homebrew packages first ---
-if command -v brew >/dev/null 2>&1; then
-  echo "📦 Installing Homebrew packages from Brewfile..."
-  brew bundle --file=Brewfile
-else
-  echo "⚠️ Homebrew not found. Skipping Brewfile installation."
+# --- Install dependencies (e.g. yq) ---
+echo "📦 Installing packages from Brewfile..."
+brew bundle --file=Brewfile
+
+# --- Load config ---
+if [ ! -f "$CONFIG_FILE" ]; then
+  echo "❌ $CONFIG_FILE not found. Please create it before bootstrapping."
+  exit 1
 fi
 
-echo "Bootstrapping dotfiles from '$STOW_DIR' to '$TARGET_DIR'..."
+full_name=$(yq ".full_name" "$CONFIG_FILE")
+email=$(yq ".email" "$CONFIG_FILE")
 
-# Backup and stow
-for pkg in "$STOW_DIR"/*; do
-  pkgname=$(basename "$pkg")
-  echo "Checking $pkgname..."
+# --- Generate ~/.gitconfig dynamically ---
+echo "📝 Generating ~/.gitconfig..."
+cat > "$HOME/.gitconfig" <<EOF
+[user]
+    name = $full_name
+    email = $email
 
-  for file in $(find "$pkg" -type f); do
-    relpath="${file#$pkg/}"
-    target="$TARGET_DIR/$relpath"
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
 
-    if [ -e "$target" ] && [ ! -L "$target" ]; then
-      echo "  Backing up existing $target -> $target.bak"
-      mv "$target" "$target.bak"
-    fi
+[core]
+    autocrlf = input
+
+[alias]
+    bb = !better-branch.sh
+
+[rerere]
+    enabled = true
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
+EOF
+
+# --- Generate SSH keys and .ssh/config ---
+mkdir -p "$HOME/.ssh"
+ssh_config="$HOME/.ssh/config"
+echo "🔧 Generating ~/.ssh/config..."
+: > "$ssh_config"  # clear file
+
+identity_count=$(yq '.github_identities | length' "$CONFIG_FILE")
+
+for i in $(seq 0 $((identity_count - 1))); do
+  id=$(yq ".github_identities[$i].id" "$CONFIG_FILE")
+
+  if [[ "$id" =~ [^a-zA-Z0-9_-] ]]; then
+    echo "❌ Invalid id '$id'. Only letters, numbers, dashes, and underscores are allowed."
+    exit 1
+  fi
+
+  host="gh-$id"
+  keyfile="$HOME/.ssh/id_github_$id"
+  mapfile -t orgs < <(yq ".github_identities[$i].orgs[]" "$CONFIG_FILE")
+
+  # Generate key if missing
+  if [ ! -f "$keyfile" ]; then
+    echo "🔐 Generating SSH key for $id..."
+    ssh-keygen -t ed25519 -C "$email" -f "$keyfile" -N ""
+  fi
+
+  # Add key to ssh-agent
+  if ! ssh-add -l | grep -q "$keyfile"; then
+    echo "➕ Adding key for $id to ssh-agent"
+    ssh-add --apple-use-keychain "$keyfile"
+  fi
+
+  # Add host entry to ssh config
+  cat >> "$ssh_config" <<EOF
+Host $host
+  HostName github.com
+  User git
+  IdentityFile $keyfile
+  IdentitiesOnly yes
+  UseKeychain yes
+  AddKeysToAgent yes
+EOF
+
+  # Add insteadOf mappings to .gitconfig
+  for org in "${orgs[@]}"; do
+    echo "[url \"git@$host:$org/\"]" >> "$HOME/.gitconfig"
+    echo "    insteadOf = git@github.com:$org/" >> "$HOME/.gitconfig"
+    echo >> "$HOME/.gitconfig"
   done
 
-  echo "  Stowing $pkgname"
+done
+
+# --- Stow other packages ---
+echo "📁 Stowing non-sensitive dotfiles..."
+for pkg in "$STOW_DIR"/*; do
+  pkgname=$(basename "$pkg")
+  if [[ "$pkgname" == "ssh" || "$pkgname" == "git" ]]; then
+    continue  # skip ssh and git
+  fi
+  echo "  🔗 Stowing $pkgname"
   stow --dir="$STOW_DIR" --target="$TARGET_DIR" --adopt "$pkgname"
 done
 
-echo "✅ Bootstrap complete."
+# --- Show public keys ---
+echo
+echo "📋 SSH Public Keys (add these to GitHub):"
+for i in $(seq 0 $((identity_count - 1))); do
+  id=$(yq ".github_identities[$i].id" "$CONFIG_FILE")
+  pubkey="$HOME/.ssh/id_github_$id.pub"
+  if [ -f "$pubkey" ]; then
+    echo "🔑 $id:"
+    cat "$pubkey"
+    echo
+  fi
+done
+
+echo "✅ Bootstrap complete!"
