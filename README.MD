@@ -3,7 +3,7 @@
 This repository provides a portable, secure, and scalable way to manage personal and professional homebrew dependencies, dotfiles, SSH keys, and Git configuration. All sensative data is generated with the bootstrap script, so all you need to do is distribute the generated public keys as needed when prompted.
 
 ## TLDR
-If your laptop get water damage and you need to buy a new one and get back to work in 15 minutes... Check out this repo and run the `bootstrap.sh` command and copy/paste the generated public keys where you need to and you will be back up and running in no time.
+If your laptop get water damage and you need to buy a new one and get back to work in 15 minutes... Check out this repo, update the `bootstrap.yaml` with your personal information, and run the `bootstrap.sh` command and copy/paste the generated public keys where you need to and you will be back up and running in no time.
 ## Features
 - 📁 Uses stow to manage dotfiles cleanly and modularly
 - 🔐 Generates one SSH key per GitHub identity for scoped access and easier rotation
