@@ -21,3 +21,6 @@
         insteadOf = git@github.com:unified-trials/
 [url "git@gh_evinova:evinova/"]
         insteadOf = git@github.com:evinova/
+[url "git@github-personal:"]
+    insteadOf = git@github.com:sailorgeoffrey/
+
