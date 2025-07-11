@@ -60,10 +60,10 @@ cat > "$HOME/.gitconfig" <<EOF
 EOF
 
 # --- Generate SSH keys and .ssh/config ---
-mkdir -p "$HOME/.ssh"
+echo "🔧 Preparing ~/.ssh/config..."
 ssh_config="$HOME/.ssh/config"
-echo "🔧 Generating ~/.ssh/config..."
-: > "$ssh_config"  # clear file
+mkdir -p "$(dirname "$ssh_config")"
+: > "$ssh_config"
 
 identity_count=$(yq '.github_identities | length' "$CONFIG_FILE")
 
@@ -77,7 +77,12 @@ for i in $(seq 0 $((identity_count - 1))); do
 
   host="gh-$id"
   keyfile="$HOME/.ssh/id_github_$id"
-  mapfile -t orgs < <(yq ".github_identities[$i].orgs[]" "$CONFIG_FILE")
+
+  # Read orgs into array without mapfile (for macOS Bash 3.x compatibility)
+  orgs=()
+  while IFS= read -r org; do
+    orgs+=("$org")
+  done < <(yq ".github_identities[$i].orgs[]" "$CONFIG_FILE")
 
   # Generate key if missing
   if [ ! -f "$keyfile" ]; then
