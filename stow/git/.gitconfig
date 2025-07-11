@@ -21,7 +21,3 @@
         insteadOf = git@github.com:unified-trials/
 [url "git@gh_evinova:evinova/"]
         insteadOf = git@github.com:evinova/
-[commit]
-	gpgsign = true
-[tag]
-	gpgSign = true
