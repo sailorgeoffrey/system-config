@@ -1,3 +1,5 @@
+.DS_Store
+
 # Ignore sensitive files
 .aws/credentials
 .ssh/id_*
