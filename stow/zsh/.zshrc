@@ -4,8 +4,9 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
 fi
 
 # Directory Hash
-hash -d pdr=~/vcs/github.com/evinova/platform-perimeter-data-router
 hash -d ev=~/vcs/github.com/evinova
+hash -d esdp=~ev/platform-entity-stream-data-plane
+hash -d pdr=~ev/platform-perimeter-data-router
 
 # Aliases
 alias cd='cd -P'
