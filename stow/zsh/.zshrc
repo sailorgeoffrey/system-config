@@ -3,14 +3,14 @@ if [[ -f "/opt/homebrew/bin/brew" ]]; then
   eval "$(/opt/homebrew/bin/brew shellenv)"
 fi
 
+export CLICOLOR=1
+
 # Directory Hash
 hash -d ev=~/vcs/github.com/evinova
 hash -d esdp=~ev/platform-entity-stream-data-plane
 hash -d pdr=~ev/platform-perimeter-data-router
 
 # Aliases
-alias cd='cd -P'
-alias ls='ls --color'
 alias ll='ls -l'
 alias la='ls -a'
 alias lal='ls -al'
@@ -29,6 +29,31 @@ export MODULAR_HOME="$HOME/.modular"
 export NVM_DIR="$HOME/.nvm"
 export FZF_TAB_PREVIEW_OPTS="--height=100% --preview-window=bottom"
 
+# Greeting
+greet() {
+    COWBASE="$HOMEBREW_CELLAR/cowsay"
+    COWVER=$(ls "$COWBASE" | sort -V | tail -n 1)
+    COWDIR="$COWBASE/$COWVER/share/cowsay/cows/"
+    FORTDIR="$HOMEBREW_CELLAR/fortune/9708/share/games/fortunes/"
+    fortune -s $FORTDIR | cowsay -W 77 -f $COWDIR$(ls $COWDIR | grep \.cow | gshuf -n1) | lolcat
+    echo
+}
+
+# Function to show the interface IP address
+ifip() {
+    ifconfig $1 | grep inet | grep broadcast | awk '{print $2}'
+}
+
+# Display useful host related informaton
+ii() {
+    echo -e "\nYou are logged on `hostname`"
+    echo -e "\nUsers logged on: " ; w -h
+    echo -e "\nCurrent date : " ; date
+    echo -e "\nMachine stats : " ; uptime
+    echo -e "\nCurrent network location : " ; scselect
+    #echo -e "\nDNS Configuration: " ; scutil --dns
+    echo
+}
 
 # Function used to preview files and folders
 termview() {
@@ -216,3 +241,7 @@ path+=(~/.modular/bin)
 path+=(~/.local/bin)
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+if [ "$LC_TERMINAL" = "iTerm2" ] || [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
+	greet
+fi
