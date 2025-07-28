@@ -103,15 +103,34 @@ alias sso='p=$(select_aws_profile) && [ -n "$p" ] && aws sso login --profile "$p
 
 # Function to wrap AWS CLI
 aws() {
+  # If neither AWS_PROFILE nor AWS_ACCESS_KEY_ID is set...
   if [ -z "$AWS_PROFILE" ] && [ -z "$AWS_ACCESS_KEY_ID" ]; then
-    local profile=$(select_aws_profile)
-    if [ $? -eq 0 ]; then
-      export AWS_PROFILE="$profile"
-    else
-      echo "No profile selected. Exiting." >&2
-      return 1
+    # Check if "--profile" was passed in the args
+    for arg in "$@"; do
+      if [[ "$arg" == --profile ]]; then
+        break
+      fi
+      if [[ "$arg" == --profile=* ]]; then
+        break
+      fi
+      # Special case: handle `--profile xyz` (two words)
+      if [[ "$prev" == --profile ]]; then
+        break
+      fi
+      prev="$arg"
+    done
+
+    if [[ "$arg" != --profile && "$arg" != --profile=* && "$prev" != --profile ]]; then
+      local profile=$(select_aws_profile)
+      if [ $? -eq 0 ]; then
+        export AWS_PROFILE="$profile"
+      else
+        echo "No profile selected. Exiting." >&2
+        return 1
+      fi
     fi
   fi
+
   command aws "$@"
 }
 
