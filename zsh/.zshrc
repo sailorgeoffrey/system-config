@@ -26,6 +26,13 @@ alias la='ls -a'
 alias ll='ls -l'
 alias lla='ls -al'
 
+aws_region_list=$(cat <<EOF
+eu-central-1
+eu-west-1
+us-east-1
+EOF
+)
+
 # Enable color names like $fg[red], %F{blue}, etc.
 autoload -Uz colors && colors
 
@@ -47,6 +54,17 @@ ifip() {
 # Fuzzy search selection for an AWS profile
 select_aws_profile() {
   command aws configure list-profiles | fzf --prompt="Select AWS profile: "
+}
+
+# Set the AWS region env var
+set_aws_region() {
+  emulate -L zsh
+  setopt localoptions
+  local region_list region
+  region=$(echo "$aws_region_list" | fzf --prompt='Select AWS Region: ') || return 1
+  export AWS_REGION=$region
+  export AWS_DEFAULT_REGION=$region
+  echo "✔ AWS_REGION set to: $AWS_REGION"
 }
 
 # Set the AWS profile env var
@@ -140,7 +158,10 @@ zstyle ':completion:*:*:task:*' sort false
 zstyle ':completion::complete:*' use-cache on
 zstyle ':completion:*' verbose yes
 zstyle ':completion:*' format '%d'
-zstyle ':fzf-tab:*' fzf-flags --layout=reverse --height=100% --preview-window=right:70%:wrap
+zstyle ':fzf-tab:*' fzf-flags --preview-window=right:60%:wrap --layout=reverse --height=100% \
+  --bind='left:change-preview-window(right:70%)' \
+  --bind='right:change-preview-window(right:30%)' \
+  --bind='ctrl-/:toggle-preview'
 zstyle ':fzf-tab:complete:*:*' fzf-preview '~/.zsh/preview.zsh "${realpath:-$word}"'
 zstyle ':fzf-tab:complete:task:*' fzf-preview 'task --summary $word'
 zstyle ':fzf-tab:complete:aws:*' fzf-preview '$words $word help'

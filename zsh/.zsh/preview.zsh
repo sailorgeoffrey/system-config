@@ -4,10 +4,10 @@ target=$1
 if [[ -d "$target" ]]; then
   ls -G "$target"
 elif [[ -f "$target" ]]; then
-  case "$target" in
-    Taskfile.yml) task -t "$target" -l ;;
-    *.png|*.jpg|*.jpeg|*.gif|*.bmp|*.tiff) viu -w 40 -h 20 "$target" ;;
-    *.md) mdless -p "$target" ;;
+  case "${target:l}" in
+    *taskfile.yml) task -t "$target" -l ;;
+    *.png|*.jpg|*.jpeg|*.gif|*.bmp|*.tiff) viu -w 80 "$target" ;;
+    *.md) COLUMNS=$FZF_PREVIEW_COLUMNS mdless -p "$target" ;;
     *.cow) cowsay -f "./$target" "What would you have me say?" ;;
     *) bat --style=plain --color=always --line-range :100 "$target" ;;
   esac
