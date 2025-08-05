@@ -19,4 +19,3 @@ export PATH
 export KUBE_EDITOR="idea -e -w"
 export MODULAR_HOME="$HOME/.modular"
 export NVM_DIR="$HOME/.nvm"
-export FZF_TAB_PREVIEW_OPTS="--height=100% --preview-window=bottom"

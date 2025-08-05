@@ -46,7 +46,7 @@ github_identities:
 
 ### 3. Run the bootstrap
 
-`./bootstrap.sh`
+`bootstrap/bootstrap.sh`
 
 #### This will:
 - Install dependencies (like yq, stow)
@@ -65,22 +65,13 @@ ssh-ed25519 AAAAC3...
 Go to https://github.com/settings/keys and paste each key as needed.
 
 ### 5. Verify the setup
-`./verify_github_keys.sh`
+`bootstrap/verify_github_keys.sh`
 
 ### This will:
 - Check that each key file exists
 - Confirm it’s loaded in ssh-agent
 - Attempt SSH authentication via your aliases (e.g. git@gh-geoff)
 
-## Repo Structure
-```
-├── bootstrap.sh            # Main bootstrap script
-├── verify_github_keys.sh   # Verifies SSH + GitHub config
-├── bootstrap.yaml          # Your config-as-code input file (not checked in)
-├── stow/                   # Stow-managed dotfiles (e.g. zsh, vim, etc.)
-├── Brewfile                # Homebrew dependencies
-└── README.md
-```
 
 ## Notes
 - This setup avoids stowing .ssh/ and .gitconfig directly — instead, they are generated from config.

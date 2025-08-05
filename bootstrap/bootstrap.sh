@@ -2,8 +2,6 @@
 set -euo pipefail
 
 CONFIG_FILE="bootstrap.yaml"
-STOW_DIR="stow"
-TARGET_DIR="$HOME"
 
 # --- Ensure Homebrew is installed ---
 if ! command -v brew >/dev/null 2>&1; then
@@ -117,15 +115,8 @@ EOF
 done
 
 # --- Stow other packages ---
-echo "📁 Stowing non-sensitive dotfiles..."
-for pkg in "$STOW_DIR"/*; do
-  pkgname=$(basename "$pkg")
-  if [[ "$pkgname" == "ssh" || "$pkgname" == "git" ]]; then
-    continue  # skip ssh and git
-  fi
-  echo "  🔗 Stowing $pkgname"
-  stow --dir="$STOW_DIR" --target="$TARGET_DIR" --adopt "$pkgname"
-done
+stow zsh
+stow tmux
 
 # --- Show public keys ---
 echo
