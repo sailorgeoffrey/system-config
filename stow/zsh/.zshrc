@@ -1,58 +1,51 @@
-if [[ -f "/opt/homebrew/bin/brew" ]]; then
-  # If you're using macOS, you'll want this enabled
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-fi
-
-export CLICOLOR=1
-
 # Directory Hash
 hash -d ev=~/vcs/github.com/evinova
 hash -d esdp=~ev/platform-entity-stream-data-plane
 hash -d pdr=~ev/platform-perimeter-data-router
 
 # Aliases
-alias ll='ls -l'
+
+alias netCons='lsof -i'                                                                             # netCons:      Show all open TCP/IP sockets
+alias flushDNS='dscacheutil -flushcache'                                                            # flushDNS:     Flush out the DNS Cache
+alias lsock='sudo /usr/sbin/lsof -i -P'                                                             # lsock:        Display open sockets
+alias lsockU='sudo /usr/sbin/lsof -nP | grep UDP'                                                   # lsockU:       Display only open UDP sockets
+alias lsockT='sudo /usr/sbin/lsof -nP | grep TCP'                                                   # lsockT:       Display only open TCP sockets
+alias ipInfo0='ipconfig getpacket en0'                                                              # ipInfo0:      Get info on connections for en0
+alias ipInfo1='ipconfig getpacket en1'                                                              # ipInfo1:      Get info on connections for en1
+alias openPorts='sudo lsof -i | grep LISTEN'                                                        # openPorts:    All listening connections
+alias showBlocked='sudo ipfw list'                                                                  # showBlocked:  All ipfw rules inc/ blocked IPs
+alias sso='p=$(select_aws_profile) && [ -n "$p" ] && aws sso login --profile "$p" || return 1'      # sso:          AWS SSO login
+alias rot13="tr 'A-Za-z0-9' 'N-ZA-Mn-za-m5-90-4'"                                                   # rot13:        Simple letter substitution cipher
+alias vi=nvim
+alias vim=nvim
+alias view=termview
+alias k=kubectl
+alias kx=kubectx
+alias kn=kubens
+alias ll="ls -l"
+alias l="ls"
 alias la='ls -a'
 alias lal='ls -al'
 alias lla='lal'
 alias edit='idea -e'
-alias vi=nvim
-alias vim=nvim
-alias view=termview
-alias rot13="tr 'A-Za-z0-9' 'N-ZA-Mn-za-m5-90-4'"
-alias k=kubectl
-alias kx=kubectx
-alias kn='f() { [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6 ; } ; f'
 
-export KUBE_EDITOR="idea -e -w"
-export MODULAR_HOME="$HOME/.modular"
-export NVM_DIR="$HOME/.nvm"
-export FZF_TAB_PREVIEW_OPTS="--height=100% --preview-window=bottom"
-
-# Greeting
-greet() {
-    COWBASE="$HOMEBREW_CELLAR/cowsay"
-    COWVER=$(ls "$COWBASE" | sort -V | tail -n 1)
-    COWDIR="$COWBASE/$COWVER/share/cowsay/cows/"
-    FORTDIR="$HOMEBREW_CELLAR/fortune/9708/share/games/fortunes/"
-    fortune -s $FORTDIR | cowsay -W 77 -f $COWDIR$(ls $COWDIR | grep \.cow | gshuf -n1) | lolcat
-    echo
-}
+# Recursively list contents of folders
+alias lr='ls -R | grep ":$" | sed -e '\''s/:$//'\'' -e '\''s/[^-][^\/]*\//--/g'\'' -e '\''s/^/   /'\'' -e '\''s/-/|/'\'' | less'
 
 # Function to show the interface IP address
 ifip() {
-    ifconfig $1 | grep inet | grep broadcast | awk '{print $2}'
+  ifconfig $1 | grep inet | grep broadcast | awk '{print $2}'
 }
 
 # Display useful host related informaton
 ii() {
-    echo -e "\nYou are logged on `hostname`"
-    echo -e "\nUsers logged on: " ; w -h
-    echo -e "\nCurrent date : " ; date
-    echo -e "\nMachine stats : " ; uptime
-    echo -e "\nCurrent network location : " ; scselect
-    #echo -e "\nDNS Configuration: " ; scutil --dns
-    echo
+  echo -e "\nYou are logged on `hostname`"
+  echo -e "\nUsers logged on: " ; w -h
+  echo -e "\nCurrent date : " ; date
+  echo -e "\nMachine stats : " ; uptime
+  echo -e "\nCurrent network location : " ; scselect
+  #echo -e "\nDNS Configuration: " ; scutil --dns
+  echo
 }
 
 # Function used to preview files and folders
@@ -67,12 +60,18 @@ termview() {
         viu -w 40 -h 20 "$1" ;;
       *.md)
         glow "$1" ;;
+      *.cow)
+        cowsay -f "./$1" "Hello World" ;;
       *)
         bat --style=plain --color=always --line-range :100 "$1" ;;
     esac
   else
     echo "Not a file"
   fi
+}
+
+kubens() {
+  [ "$1" ] && kubectl config set-context --current --namespace $1 || kubectl config view --minify | grep namespace | cut -d" " -f6
 }
 
 select_aws_profile() {
@@ -122,9 +121,6 @@ set_aws_profile() {
     echo "AWS profile set to: $AWS_PROFILE" >&2
   fi
 }
-
-# Alias for SSO login
-alias sso='p=$(select_aws_profile) && [ -n "$p" ] && aws sso login --profile "$p" || return 1'
 
 # Function to wrap AWS CLI
 aws() {
@@ -200,6 +196,9 @@ bindkey '^p' history-search-backward
 bindkey '^n' history-search-forward
 bindkey '^[w' kill-region
 
+# Auto CD
+setopt autocd                   # Allow changing directories without `cd`
+
 # History
 HISTSIZE=5000
 HISTFILE=~/.zsh_history
@@ -207,11 +206,14 @@ SAVEHIST=$HISTSIZE
 HISTDUP=erase
 setopt appendhistory
 setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
 setopt hist_find_no_dups
+setopt hist_expire_dups_first   # Clear duplicates when trimming internal hist.
+setopt hist_find_no_dups        # Don't display duplicates during searches.
+setopt hist_ignore_dups         # Ignore consecutive duplicates.
+setopt hist_ignore_all_dups     # Remember only one unique copy of the command.
+setopt hist_ignore_space        # Ignore commands that start with a space (for hiding sensitive data)
+setopt hist_reduce_blanks       # Remove superfluous blanks.
+setopt hist_save_no_dups        # Omit older commands in favor of newer ones.
 
 # Completion styling
 zstyle ':completion:*' special-dirs true
@@ -229,19 +231,14 @@ termview \"\$realpath\"
 "
 zstyle ':fzf-tab:complete:task:*' fzf-preview 'task --summary $word'
 
-# Add dirs to PATH
-path+=(/opt/homebrew/bin)
-path+=(~/Documents/bin)
-path+=(~/Applications/**/bin)
-path+=(~/bin)
-path+=(~/.rvm/bin)
-path+=(~/.cargo/bin)
-path+=(~/.modular/pkg/packages.modular.com_mojo/bin)
-path+=(~/.modular/bin)
-path+=(~/.local/bin)
-
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
+# Greeting
 if [ "$LC_TERMINAL" = "iTerm2" ] || [ "$TERM_PROGRAM" = "Apple_Terminal" ]; then
-	greet
+    COWBASE="$HOMEBREW_CELLAR/cowsay"
+    COWVER=$(ls "$COWBASE" | sort -V | tail -n 1)
+    COWDIR="$COWBASE/$COWVER/share/cowsay/cows/"
+    FORTDIR="$HOMEBREW_CELLAR/fortune/9708/share/games/fortunes/"
+    fortune -s $FORTDIR | cowsay -W 77 -f $COWDIR$(ls $COWDIR | grep \.cow | gshuf -n1) | lolcat
+    echo
 fi
