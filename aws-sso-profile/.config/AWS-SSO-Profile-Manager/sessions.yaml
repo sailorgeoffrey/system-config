@@ -1,0 +1,12 @@
+Evinova:
+  prefix: ev
+  start_url: https://d-9067f984ff.awsapps.com/start
+  sso_region: us-east-1
+AstraZeneca:
+  prefix: az
+  start_url: https://ets-app-workloads-master.awsapps.com/start
+  sso_region: eu-west-1
+Advantageous:
+  prefix: adv
+  start_url: https://advantageous.awsapps.com/start
+  sso_region: eu-central-1
