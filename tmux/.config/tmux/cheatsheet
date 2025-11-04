@@ -1,0 +1,5 @@
+prefix + c | new-window | create a new tmux window
+prefix + % | split-window -h | vertical split (side-by-side)
+prefix + " | split-window -v | horizontal split (top/bottom)
+prefix + n | next-window | go to next window
+

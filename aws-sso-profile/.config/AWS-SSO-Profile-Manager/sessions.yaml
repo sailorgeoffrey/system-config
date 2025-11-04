@@ -1,0 +1,16 @@
+ev:
+  start_url: https://d-9067f984ff.awsapps.com/start
+  sso_region: us-east-1
+  region: eu-west-1
+ev-china:
+  start_url: https://start.cn-north-1.home.awsapps.cn/directory/d-8267160432
+  sso_region: cn-north-1
+  region: cn-north-1
+az:
+  start_url: https://ets-app-workloads-master.awsapps.com/start
+  sso_region: eu-west-1
+  region: eu-west-1
+adv:
+  start_url: https://advantageous.awsapps.com/start
+  sso_region: eu-central-1
+  region: eu-central-1
