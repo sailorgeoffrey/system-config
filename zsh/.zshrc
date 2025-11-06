@@ -17,11 +17,12 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
   alias ipInfo1='ipconfig getpacket en1'                    # ipInfo1:      Get info on connections for en1
   alias showBlocked='sudo ipfw list'                        # showBlocked:  All ipfw rules inc/ blocked IPs
 fi
-alias vi=nvim
-alias vim=nvim
+command -v nvim >/dev/null 2>&1 && alias vim='nvim'
+alias vi=vim
 alias k=kubectl
 alias kx=kubectx
 alias kn=kubens
+command -v lsd >/dev/null 2>&1 && alias ls='lsd'
 alias l='ls'
 alias la='ls -a'
 alias ll='ls -l'
