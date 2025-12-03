@@ -27,6 +27,7 @@ alias l='ls'
 alias la='ls -a'
 alias ll='ls -l'
 alias lla='ls -al'
+alias hl='rg --passthru'
 
 aws_region_list=$(cat <<EOF
 eu-central-1
@@ -148,29 +149,12 @@ zinit light rupa/z
 autoload -Uz bashcompinit && bashcompinit
 complete -C $(which aws_completer) aws
 
-# Lazy-load NVM (only load when actually using node/npm/nvm)
+# Load nvm
 export NVM_DIR="$HOME/.nvm"
-nvm() {
-  unset -f nvm node npm npx
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-  nvm "$@"
-}
-node() {
-  unset -f nvm node npm npx
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  node "$@"
-}
-npm() {
-  unset -f nvm node npm npx
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  npm "$@"
-}
-npx() {
-  unset -f nvm node npm npx
-  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-  npx "$@"
-}
+# This loads nvm
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# This loads nvm bash_completion (optional)
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # Keybindings
 bindkey -e
