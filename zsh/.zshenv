@@ -21,5 +21,3 @@ fi
 export PATH
 export KUBE_EDITOR="idea -e -w"
 export MODULAR_HOME="$HOME/.modular"
-
-alias assume=". assume"

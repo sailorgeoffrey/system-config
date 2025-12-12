@@ -109,6 +109,12 @@ dockerpath="$HOME/.docker/completions"
 if [[ -d "$dockerpath" ]]; then
   fpath=("dockerpath" $fpath)
 fi
+if command -v assume >/dev/null 2>&1; then
+  alias assume=". assume"
+  fpath=("$HOME/.granted/zsh_autocomplete/assume/" $fpath)
+  fpath=("$HOME/.granted/zsh_autocomplete/granted/" $fpath)
+fi
+
 autoload -Uz compinit
 compinit
 
