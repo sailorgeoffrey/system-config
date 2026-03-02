@@ -1,5 +1,6 @@
 # Directory Hash
 hash -d gh=~/vcs/github.com
+hash -d ev=~/vcs/ev-github
 
 # Aliases
 alias netCons='lsof -i'                                     # netCons:      Show all open TCP/IP sockets
@@ -36,9 +37,6 @@ us-east-1
 cn-north-1
 EOF
 )
-
-# Enable color names like $fg[red], %F{blue}, etc.
-autoload -Uz colors && colors
 
 # Recursively list contents of folders
 lr() {

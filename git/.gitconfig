@@ -1,0 +1,37 @@
+[user]
+    name = Geoffrey Chandler
+    email = geoffc@gmail.com
+    signingkey = ~/.ssh/github-personal.pub
+
+[gpg]
+    format = ssh
+
+[gpg "ssh"]
+    program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+
+[commit]
+    gpgsign = true
+
+[includeIf "gitdir:~/vcs/ev-github/"]
+    path = ~/.gitconfig-ev
+
+[filter "lfs"]
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+
+[core]
+    autocrlf = input
+
+[alias]
+    bb = !better-branch.sh
+
+[rerere]
+    enabled = true
+
+[column]
+    ui = auto
+
+[branch]
+    sort = -committerdate
