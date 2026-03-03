@@ -1,0 +1,11 @@
+[user]
+  email = Geoffrey.Chandler@Evinova.com
+  signingkey = ~/.ssh/github-ev.pub
+
+# Rewrite any SSH remote that uses github.com → github-ev
+[url "git@github-ev:"]
+  insteadOf = git@github.com:
+
+# Rewrite any HTTPS remote that uses github.com → github-ev SSH form
+[url "git@github-ev:"]
+  insteadOf = https://github.com/
