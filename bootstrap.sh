@@ -112,4 +112,9 @@ find ~/.ssh -maxdepth 1 -name "github*.pub" | while read -r keyfile; do
 done
 chmod 600 ~/.ssh/allowed_signers
 
+echo "🔍 Verifying setup..."
+[[ -f ~/.ssh/authorized_keys ]] && echo "  ✓ authorized_keys created"
+[[ -f ~/.ssh/allowed_signers ]] && echo "  ✓ allowed_signers created"
+ssh-add -L >/dev/null 2>&1 && echo "  ✓ SSH agent has keys"
+
 echo "✅ Bootstrap complete!"
