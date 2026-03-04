@@ -90,4 +90,8 @@ else
 fi
 
 echo ""
+# --- Generate authorized_keys from public keys (excluding github*) ---
+find ~/.ssh -maxdepth 1 -name "*.pub" ! -name "github*" -exec cat {} + >| ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+
 echo "✅ Bootstrap complete!"
