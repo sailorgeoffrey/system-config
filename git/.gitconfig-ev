@@ -1,5 +1,5 @@
 [user]
-  email = Geoffrey.Chandler@Evinova.com
+  email = Geoffrey.Chandler@evinova.com
   signingkey = ~/.ssh/github-ev.pub
 
 # Rewrite any SSH remote that uses github.com → github-ev
