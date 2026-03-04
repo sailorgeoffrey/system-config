@@ -94,4 +94,22 @@ echo ""
 find ~/.ssh -maxdepth 1 -name "*.pub" ! -name "github*" -exec cat {} + >| ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 
+# --- Generate allowed_signers from public keys (starting with github*) ---
+default_email=$(git config --global user.email || echo "user@example.com")
+# Clear the file first
+: >| ~/.ssh/allowed_signers
+find ~/.ssh -maxdepth 1 -name "github*.pub" | while read -r keyfile; do
+  email="$default_email"
+  # Use specific email for github-ev
+  if [[ "$keyfile" == *"github-ev"* ]]; then
+    # Look for the email in .gitconfig-ev if it exists
+    ev_config="$HOME/system-config/git/.gitconfig-ev"
+    if [[ -f "$ev_config" ]]; then
+      email=$(grep "email =" "$ev_config" | cut -d'=' -f2 | xargs)
+    fi
+  fi
+  echo "$email $(cat "$keyfile")" >> ~/.ssh/allowed_signers
+done
+chmod 600 ~/.ssh/allowed_signers
+
 echo "✅ Bootstrap complete!"
